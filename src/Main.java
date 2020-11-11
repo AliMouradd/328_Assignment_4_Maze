@@ -17,23 +17,44 @@ public class Main {
         int mazeDimension = reader.nextInt();
         reader.nextLine();
 
-        for(int j = 0; j < mazeCount; j++) {
-            for (int i = 0; i < mazeDimension; i++) {
-                mazeLine += reader.next();
-            }
-            mazeLine += ",";
-        }
+        ArrayList<Node> nodeList = new ArrayList<>();
 
+        for (int i = 0; i < mazeDimension; i++) {
+            mazeLine += reader.next();
+        }
 //        System.out.println(mazeLine);
-        
-        String tempStr[] = mazeLine.split(",");
-        List<String> mazeList = new ArrayList<String>();
-        mazeList = Arrays.asList(tempStr);
+        String bitArray[] = mazeLine.split("(?<=\\G....)");
 
-        for(String s: mazeList){
-            System.out.println(s);
+        ArrayList<String> bits = new ArrayList<>(Arrays.asList(bitArray));
+
+        for(int i =0; i < bits.size(); i++) {
+            Node tempNode = new Node(Integer.toString(i));
+            tempNode.setMazeBits(bits.get(i));
+            nodeList.add(tempNode);
         }
 
+        for(Node tempNode : nodeList){
+            if(tempNode.getMazeBits().charAt(0) == '0'){// checks the north bit for neighbors
+                tempNode.addNeighbour(nodeList.get(nodeList.indexOf(tempNode)-mazeDimension));
+            }
+            if(tempNode.getMazeBits().charAt(1) == '0'){// checks the south bit for neighbors
+                tempNode.addNeighbour(nodeList.get(nodeList.indexOf(tempNode)+mazeDimension));
+            }
+            if(tempNode.getMazeBits().charAt(2) == '0'){//checks the west bit for neighbors
+                tempNode.addNeighbour(nodeList.get(nodeList.indexOf(tempNode)-1));
+            }
+            if(tempNode.getMazeBits().charAt(3) == '0'){// checks the east bit for neighbors
+                tempNode.addNeighbour(nodeList.get(nodeList.indexOf(tempNode)+1));
+            }
+        }
+
+        System.out.println(nodeList.get(4).getNeighbours());
+
+        System.out.println(nodeList);
+//        for(String s: mazeList){
+//
+//        }
+//
 //        Node n1 = new Node("1");
 //        Node n2 = new Node("2");
 //        Node n3 = new Node("3");
@@ -53,8 +74,8 @@ public class Main {
 //        list.add(n4);
 //        list.add(n5);
 //
-//        DFS dfs = new DFS();
-//        dfs.dfs(list);
+        DFS dfs = new DFS();
+        dfs.dfs(nodeList);
     }
 }
 class Node{
@@ -62,6 +83,7 @@ class Node{
     private String name;
     private boolean visited;
     private List<Node> neighbours;
+    private String mazeBits;
 
     public Node(String name){
         this.name = name;
@@ -100,6 +122,14 @@ class Node{
     public void setNeighbours(List<Node> neighbours) {
         this.neighbours = neighbours;
     }
+
+    public void setMazeBits(String mazeBits) {
+        this.mazeBits = mazeBits;
+    }
+
+    public String getMazeBits(){
+        return mazeBits;
+    }
 }
 
 class DFS{
@@ -110,13 +140,14 @@ class DFS{
         this.nodeStack = new Stack<>();
     }
     public void dfs(List<Node> nodeList){
-        
+
         for(Node n : nodeList){
             if(!n.isVisited()){
                 n.setVisited(true);
                 dfsWithStack(n);
             }
         }
+
     }
 
     private void dfsWithStack(Node rootNode) {
@@ -124,7 +155,7 @@ class DFS{
         rootNode.setVisited(true);
 
         while(!nodeStack.isEmpty()){
-
+            System.out.println(nodeStack);
             Node actualNode = this.nodeStack.pop();
             System.out.println(actualNode+" ");
 
